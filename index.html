@@ -1,121 +1,86 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NadimRazaTV - All Bangladeshi TV Channels</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rafid Live TV</title>
+
+  <!-- Clappr -->
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    body { margin: 0; background: #000; font-family: sans-serif; color: #fff; text-align: center; }
+    #player { width: 100%; height: 220px; background: #000; }
+    .server-section { margin: 20px 0; }
+    .server-btn {
+      background: #1e88e5; color: #fff; border: none; margin: 5px;
+      padding: 10px 20px; border-radius: 5px; cursor: pointer;
+    }
+    .server-btn.active { background: #0d47a1; }
+    .ad-wrapper {
+      max-width: 320px; margin: 20px auto;
+      background: #fff; border-radius: 8px; overflow: hidden;
+    }
+    .ad-wrapper iframe { width: 100%; height: 250px; border: none; }
+  </style>
 </head>
 <body>
-  <div class="header">
-    <div class="logo">NadimRazaTV</div>
-    <div>All Bangladeshi TV Channels in One Place</div>
+
+  <!-- Clappr Player Container -->
+  <div id="player"></div>
+
+  <!-- Server Buttons -->
+  <div class="server-section">
+    <button class="server-btn active" data-url="https://live.tsports.com/mobile_hls/tsports_live_1/playlist.m3u8">BAN vs SRI</button>
+    <button class="server-btn" data-url="https://edge3-moblive.yuppcdn.net/drm/smil:tencricketdrm.smil/index.m3u8">Ten Cricket</button>
+    <button class="server-btn" data-url="https://live.tsports.com/mobile_hls/tsports_live_2/playlist.m3u8">T Sports</button>
   </div>
 
-  <div class="player-container">
-    <div id="player"></div>
-    <div class="categories">
-      <button class="category-btn active" data-category="ALL">ALL CHANNELS</button>
-      <button class="category-btn" data-category="SPORTS">SPORTS</button>
-      <button class="category-btn" data-category="BANGLA">BANGLA</button>
-      <button class="category-btn" data-category="NEWS">NEWS</button>
-      <button class="category-btn" data-category="MOVIES">MOVIES</button>
-      <button class="category-btn" data-category="CARTOON">CARTOON</button>
-      <button class="category-btn" data-category="ISLAMIC">ISLAMIC</button>
-      <button class="category-btn" data-category="MUSIC">MUSIC</button>
-    </div>
-    <div class="channel-grid" id="channelGrid">
-      <div class="loading">Loading channels...</div>
-    </div>
+  <!-- Starra Banner Ads -->
+  <div class="ad-wrapper">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : 'd6014953fbfeb02ea1203574721f5745',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/d6014953fbfeb02ea1203574721f5745/invoke.js"></script>
   </div>
 
-  <div class="footer">
-    © 2024 NadimRazaTV - All Rights Reserved
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/clappr-hlsjs-plugin@latest/dist/hlsjs.min.js"></script>
-
+  <!-- Player Script -->
   <script>
-    const playerConfig = {
-      parentId: '#player',
-      autoPlay: true,
-      mute: false,
-      height: '100%',
-      width: '100%',
-      plugins: [ClapprHls],
-      hlsjsConfig: {
-        enableWorker: true,
-        liveSyncDurationCount: 3,
-        liveMaxLatencyDurationCount: 10
-      }
-    };
-    const player = new Clappr.Player(playerConfig);
-    const channels = [
-      { name: "Ten Cricket", url: "https://edge3-moblive.yuppcdn.net/drm/smil:tencricketdrm.smil/index.m3u8", img: "https://i.ibb.co/0jQ5YHX/ten-cricket.jpg", category: "SPORTS" },
-      { name: "Star Sports", url: "https://starsportshindiii.pages.dev/index.m3u8", img: "https://i.ibb.co/4YfLZ1Q/star-sports.jpg", category: "SPORTS" },
-      { name: "Banglavision", url: "https://d1e7rcqq4o2ma.cloudfront.net/bpk-tv/1715/output/master.m3u8", img: "https://i.ibb.co/0JZQb0X/bangla-vision.jpg", category: "BANGLA" },
-      { name: "ATN Bangla", url: "https://d1e7rcqq4o2ma.cloudfront.net/bpk-tv/1722/output/master.m3u8", img: "https://i.ibb.co/0JZQb0X/atn-bangla.jpg", category: "BANGLA" },
-      { name: "Somoy TV", url: "https://d1e7rcqq4o2ma.cloudfront.net/bpk-tv/1702/output/1702.m3u8", img: "https://i.ibb.co/0JZQb0X/somoy-tv.jpg", category: "NEWS" },
-      { name: "Peace TV", url: "https://dzkyvlfyge.erbvr.com/PeaceTvBangla/tracks-v2a1/mono.m3u8", img: "https://i.ibb.co/0JZQb0X/peace-tv.jpg", category: "ISLAMIC" }
-    ];
-    const channelGrid = document.getElementById('channelGrid');
-    const categoryBtns = document.querySelectorAll('.category-btn');
+    const playerElement = document.getElementById('player');
+    const buttons = document.querySelectorAll('.server-btn');
+    let player = null;
 
-    function loadChannel(url) {
-      try {
-        player.load(url);
-        player.play();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } catch (error) {
-        console.error('Error loading channel:', error);
-        alert('Error loading channel. Please try again later.');
-      }
-    }
-
-    function createChannelCard(channel) {
-      const card = document.createElement('div');
-      card.className = 'channel-card';
-      card.dataset.category = channel.category;
-      card.innerHTML = '<img class="channel-logo" src="'+channel.img+'" alt="'+channel.name+'" loading="lazy"><div class="channel-info"><div class="channel-name">'+channel.name+'</div><div class="channel-category">'+channel.category+'</div></div>';
-      card.addEventListener('click', () => loadChannel(channel.url));
-      return card;
-    }
-
-    function filterChannels(category) {
-      const cards = document.querySelectorAll('.channel-card');
-      cards.forEach(card => {
-        card.style.display = (category === 'ALL' || card.dataset.category === category) ? 'block' : 'none';
+    function loadPlayer(url) {
+      if (player) player.destroy();
+      player = new Clappr.Player({
+        source: url,
+        parentId: "#player",
+        autoPlay: true,
+        height: "100%",
+        width: "100%"
       });
     }
 
-    function initChannelGrid() {
-      channelGrid.innerHTML = '';
-      if (channels.length === 0) {
-        channelGrid.innerHTML = '<div class="loading">No channels available</div>';
-        return;
-      }
-      channels.forEach(channel => channelGrid.appendChild(createChannelCard(channel)));
-    }
-
-    function initCategoryButtons() {
-      categoryBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-          categoryBtns.forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-          filterChannels(this.dataset.category);
-        });
+    buttons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        buttons.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        loadPlayer(this.dataset.url);
       });
-    }
+    });
 
-    function initApp() {
-      initChannelGrid();
-      initCategoryButtons();
-      if (channels.length > 0) loadChannel(channels[0].url);
-    }
-
-    document.addEventListener('DOMContentLoaded', initApp);
+    // Load first by default
+    loadPlayer(buttons[0].dataset.url);
   </script>
+
 </body>
 </html>
