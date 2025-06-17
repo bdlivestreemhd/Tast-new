@@ -1,86 +1,302 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Rafid Live TV</title>
+  <title>Rafid</title>
 
-  <!-- Clappr -->
-  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- FontAwesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- Clappr Player CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.css" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    body { margin: 0; background: #000; font-family: sans-serif; color: #fff; text-align: center; }
-    #player { width: 100%; height: 220px; background: #000; }
-    .server-section { margin: 20px 0; }
+    :root {
+      --primary-color: #007bff;
+      --active-gradient: linear-gradient(135deg, #4e54c8, #8f94fb);
+      --dark-bg: #121212;
+      --medium-bg: #1f1f1f;
+      --light-bg: #2a2a2a;
+      --text-color: #f0f0f0;
+      --border-color: #444;
+      --shadow-color: rgba(0, 0, 0, 0.4);
+      --server-card-bg: #1a1a1a;
+      --server-card-hover: #2d2d2d;
+    }
+    html, body {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      background-color: var(--dark-bg);
+      font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+      display: flex; flex-direction: column;
+    }
+    #playerContainer {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background-color: #000;
+      position: relative;
+      border: none;
+      transition: opacity 0.4s ease-in-out;
+      box-shadow: 0 5px 15px var(--shadow-color);
+      flex-shrink: 0;
+    }
+    #playerContainer .clappr-container {
+      width: 100%;
+      height: 100%;
+    }
+    .server-section {
+      width: 100%;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      padding: 12px 0;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      flex-shrink: 0;
+    }
+    .server-section::-webkit-scrollbar { display: none; }
+    .server-buttons {
+      display: inline-flex;
+      padding: 0 12px;
+      gap: 10px;
+    }
     .server-btn {
-      background: #1e88e5; color: #fff; border: none; margin: 5px;
-      padding: 10px 20px; border-radius: 5px; cursor: pointer;
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--server-card-bg);
+      color: var(--text-color);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 12px 15px;
+      min-width: 120px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .server-btn.active { background: #0d47a1; }
+    .server-btn .server-quality {
+      font-size: 11px;
+      background: rgba(0,0,0,0.3);
+      padding: 3px 6px;
+      border-radius: 6px;
+      margin-top: 5px;
+      font-weight: 500;
+    }
+    .server-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      background: var(--server-card-hover);
+      border-color: rgba(255,255,255,0.2);
+    }
+    .server-btn.active {
+      background: var(--active-gradient);
+      border-color: rgba(255,255,255,0.3);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(78, 84, 200, 0.5);
+      padding-right: 30px;
+    }
+    .tick {
+      display: inline-block;
+      width: 6px;
+      height: 12px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      margin-top: -7px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .server-btn.active .tick { opacity: 1; }
+    .info-section {
+      flex-grow: 1;
+      padding: 15px;
+      overflow-y: auto;
+      background-color: var(--dark-bg);
+      color: var(--text-color);
+    }
+    .info-content { max-width: 900px; margin: 0 auto; text-align: left; }
+    .match-banner {
+      max-width: 100%;
+      width: 240px;
+      height: auto;
+      display: block;
+      margin: 0 auto 15px;
+      border-radius: 6px;
+      background-color: var(--medium-bg);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    }
+    .info-content .description {
+      font-size: 14px;
+      color: #ccc;
+      line-height: 1.5;
+      margin-bottom: 15px;
+      text-align: center;
+      padding: 0 10px;
+    }
+    .info-content .meta-info {
+      font-size: 13px;
+      color: #aaa;
+      background: var(--medium-bg);
+      padding: 12px;
+      border-radius: 6px;
+      border-left: 3px solid var(--primary-color);
+      margin-bottom: 15px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      line-height: 1.6;
+    }
+    .share-section h3 {
+      font-size: 15px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+      color: #8f94fb;
+    }
+    .share-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .share-buttons a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: var(--medium-bg);
+      border-radius: 50%;
+      color: #ccc;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .share-buttons a:hover {
+      color: #fff;
+      transform: scale(1.05);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    }
+    .share-buttons a.facebook:hover { background: #3b5998; color: white; }
+    .share-buttons a.twitter:hover { background: #1da1f2; color: white; }
+    .share-buttons a.whatsapp:hover { background: #25d366; color: white; }
+    .share-buttons svg { width: 18px; height: 18px; }
     .ad-wrapper {
-      max-width: 320px; margin: 20px auto;
-      background: #fff; border-radius: 8px; overflow: hidden;
+      text-align: center;
+      margin: 20px auto;
     }
-    .ad-wrapper iframe { width: 100%; height: 250px; border: none; }
   </style>
 </head>
 <body>
+  <!-- Player Container -->
+  <div id="playerContainer"></div>
 
-  <!-- Clappr Player Container -->
-  <div id="player"></div>
-
-  <!-- Server Buttons -->
+  <!-- Server Section -->
   <div class="server-section">
-    <button class="server-btn active" data-url="https://live.tsports.com/mobile_hls/tsports_live_1/playlist.m3u8">BAN vs SRI</button>
-    <button class="server-btn" data-url="https://edge3-moblive.yuppcdn.net/drm/smil:tencricketdrm.smil/index.m3u8">Ten Cricket</button>
-    <button class="server-btn" data-url="https://live.tsports.com/mobile_hls/tsports_live_2/playlist.m3u8">T Sports</button>
+    <div class="server-buttons">
+      <button class="server-btn active" data-url="https://live.tsports.com/mobile_hls/tsports_live_1/playlist.m3u8">
+        BAN vs SRI
+        <span class="server-quality">Server 1</span>
+        <span class="tick"></span>
+      </button>
+      <button class="server-btn" data-url="https://edge3-moblive.yuppcdn.net/drm/smil:tencricketdrm.smil/index.m3u8">
+        Ten Cricket
+        <span class="server-quality">Server 2</span>
+        <span class="tick"></span>
+      </button>
+      <button class="server-btn" data-url="https://live.tsports.com/mobile_hls/tsports_live_2/playlist.m3u8">
+        Tsports
+        <span class="server-quality">Server 3</span>
+        <span class="tick"></span>
+      </button>
+    </div>
   </div>
 
-  <!-- Starra Banner Ads -->
+  <!-- Info Section -->
+  <div class="info-section">
+    <div class="info-content">
+      <img src="https://i.postimg.cc/43qJPPLY/20250617-203701.png" alt="Match Banner" class="match-banner">
+      <p class="description">
+        🏏 <strong>বাংলাদেশ বনাম শ্রীলঙ্কা</strong> লাইভ স্ট্রিমিং<br>
+        উপরের সার্ভার থেকে আপনার পছন্দমতো একটি নির্বাচন করুন
+      </p>
+      <p class="meta-info">
+        <strong>⚠️ সমস্যা সমাধান:</strong> অন্য সার্ভার চেষ্টা করুন বা আমাদের জানান<br>
+        <strong>📌 টিপস:</strong> ভাল কানেকশনের জন্য Wi-Fi ব্যবহার করুন
+      </p>
+      <div class="share-section">
+        <h3><i class="fas fa-share-alt"></i> Share this Stream</h3>
+        <div class="share-buttons">
+          <a href="#" class="facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="twitter" title="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="whatsapp" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clappr Player JS -->
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const playerContainer = document.getElementById('playerContainer');
+      const serverButtons = document.querySelectorAll('.server-btn');
+      let player = null;
+
+      function loadStream(url) {
+        playerContainer.style.opacity = '0.3';
+        setTimeout(() => {
+          if (player) player.destroy();
+          player = new Clappr.Player({
+            source: url,
+            parentId: '#playerContainer',
+            autoPlay: true,
+            height: '100%',
+            width: '100%'
+          });
+          playerContainer.style.opacity = '1';
+        }, 300);
+      }
+
+      serverButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          if (this.classList.contains('active')) return;
+          const newUrl = this.dataset.url;
+          loadStream(newUrl);
+          serverButtons.forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+
+      const firstActiveButton = document.querySelector('.server-btn.active');
+      if (firstActiveButton) loadStream(firstActiveButton.dataset.url);
+    });
+  </script>
+
+  <!-- ✅ Ad Code Onek Nicher E -->
   <div class="ad-wrapper">
     <script type="text/javascript">
       atOptions = {
-        'key' : 'd6014953fbfeb02ea1203574721f5745',
+        'key' : '02de108af54a585c3b88855f63497f54',
         'format' : 'iframe',
-        'height' : 250,
-        'width' : 300,
+        'height' : 90,
+        'width' : 728,
         'params' : {}
       };
     </script>
-    <script type="text/javascript" src="//www.highperformanceformat.com/d6014953fbfeb02ea1203574721f5745/invoke.js"></script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/02de108af54a585c3b88855f63497f54/invoke.js"></script>
   </div>
-
-  <!-- Player Script -->
-  <script>
-    const playerElement = document.getElementById('player');
-    const buttons = document.querySelectorAll('.server-btn');
-    let player = null;
-
-    function loadPlayer(url) {
-      if (player) player.destroy();
-      player = new Clappr.Player({
-        source: url,
-        parentId: "#player",
-        autoPlay: true,
-        height: "100%",
-        width: "100%"
-      });
-    }
-
-    buttons.forEach(btn => {
-      btn.addEventListener('click', function() {
-        buttons.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        loadPlayer(this.dataset.url);
-      });
-    });
-
-    // Load first by default
-    loadPlayer(buttons[0].dataset.url);
-  </script>
 
 </body>
 </html>
