@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NadimRazaTV - All Bangladeshi TV Channels</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <div class="logo">NadimRazaTV</div>
+    <div>All Bangladeshi TV Channels in One Place</div>
+  </div>
+
+  <div class="player-container">
+    <div id="player"></div>
+    <div class="categories">
+      <button class="category-btn active" data-category="ALL">ALL CHANNELS</button>
+      <button class="category-btn" data-category="SPORTS">SPORTS</button>
+      <button class="category-btn" data-category="BANGLA">BANGLA</button>
+      <button class="category-btn" data-category="NEWS">NEWS</button>
+      <button class="category-btn" data-category="MOVIES">MOVIES</button>
+      <button class="category-btn" data-category="CARTOON">CARTOON</button>
+      <button class="category-btn" data-category="ISLAMIC">ISLAMIC</button>
+      <button class="category-btn" data-category="MUSIC">MUSIC</button>
+    </div>
+    <div class="channel-grid" id="channelGrid">
+      <div class="loading">Loading channels...</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2024 NadimRazaTV - All Rights Reserved
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/clappr-hlsjs-plugin@latest/dist/hlsjs.min.js"></script>
+
+  <script>
+    const playerConfig = {
+      parentId: '#player',
+      autoPlay: true,
+      mute: false,
+      height: '100%',
+      width: '100%',
+      plugins: [ClapprHls],
+      hlsjsConfig: {
+        enableWorker: true,
+        liveSyncDurationCount: 3,
+        liveMaxLatencyDurationCount: 10
+      }
+    };
+    const player = new Clappr.Player(playerConfig);
+    const channels = [
+      { name: "Ten Cricket", url: "https://edge3-moblive.yuppcdn.net/drm/smil:tencricketdrm.smil/index.m3u8", img: "https://i.ibb.co/0jQ5YHX/ten-cricket.jpg", category: "SPORTS" },
+      { name: "Star Sports", url: "https://starsportshindiii.pages.dev/index.m3u8", img: "https://i.ibb.co/4YfLZ1Q/star-sports.jpg", category: "SPORTS" },
+      { name: "Banglavision", url: "https://d1e7rcqq4o2ma.cloudfront.net/bpk-tv/1715/output/master.m3u8", img: "https://i.ibb.co/0JZQb0X/bangla-vision.jpg", category: "BANGLA" },
+      { name: "ATN Bangla", url: "https://d1e7rcqq4o2ma.cloudfront.net/bpk-tv/1722/output/master.m3u8", img: "https://i.ibb.co/0JZQb0X/atn-bangla.jpg", category: "BANGLA" },
+      { name: "Somoy TV", url: "https://d1e7rcqq4o2ma.cloudfront.net/bpk-tv/1702/output/1702.m3u8", img: "https://i.ibb.co/0JZQb0X/somoy-tv.jpg", category: "NEWS" },
+      { name: "Peace TV", url: "https://dzkyvlfyge.erbvr.com/PeaceTvBangla/tracks-v2a1/mono.m3u8", img: "https://i.ibb.co/0JZQb0X/peace-tv.jpg", category: "ISLAMIC" }
+    ];
+    const channelGrid = document.getElementById('channelGrid');
+    const categoryBtns = document.querySelectorAll('.category-btn');
+
+    function loadChannel(url) {
+      try {
+        player.load(url);
+        player.play();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (error) {
+        console.error('Error loading channel:', error);
+        alert('Error loading channel. Please try again later.');
+      }
+    }
+
+    function createChannelCard(channel) {
+      const card = document.createElement('div');
+      card.className = 'channel-card';
+      card.dataset.category = channel.category;
+      card.innerHTML = '<img class="channel-logo" src="'+channel.img+'" alt="'+channel.name+'" loading="lazy"><div class="channel-info"><div class="channel-name">'+channel.name+'</div><div class="channel-category">'+channel.category+'</div></div>';
+      card.addEventListener('click', () => loadChannel(channel.url));
+      return card;
+    }
+
+    function filterChannels(category) {
+      const cards = document.querySelectorAll('.channel-card');
+      cards.forEach(card => {
+        card.style.display = (category === 'ALL' || card.dataset.category === category) ? 'block' : 'none';
+      });
+    }
+
+    function initChannelGrid() {
+      channelGrid.innerHTML = '';
+      if (channels.length === 0) {
+        channelGrid.innerHTML = '<div class="loading">No channels available</div>';
+        return;
+      }
+      channels.forEach(channel => channelGrid.appendChild(createChannelCard(channel)));
+    }
+
+    function initCategoryButtons() {
+      categoryBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          categoryBtns.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          filterChannels(this.dataset.category);
+        });
+      });
+    }
+
+    function initApp() {
+      initChannelGrid();
+      initCategoryButtons();
+      if (channels.length > 0) loadChannel(channels[0].url);
+    }
+
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
